@@ -18,6 +18,11 @@ type App struct {
 func NewApp(logger *logging.Logger, config *config.Config) (*App, error) {
 	router := httprouter.New()
 
+	router.GET("/health-check", func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+		writer.Write([]byte("Healthy"))
+		writer.WriteHeader(200)
+	})
+
 	return &App{
 		logger: logger,
 		cfg:    config,
@@ -39,6 +44,7 @@ func (a *App) Start() {
 
 	if err := a.httpServer.ListenAndServe(); err != nil {
 		a.logger.Error("Failed to start server", "error", err)
+		panic(err)
 	}
 
 	a.logger.Error("Server stopped")
